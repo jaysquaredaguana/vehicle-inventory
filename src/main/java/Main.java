@@ -32,7 +32,7 @@ public class Main {
             System.out.println(" 4 - Search by color");
             System.out.println(" 5 - Add a vehicle");
             System.out.println(" 6 - Quit");
-            System.out.println("Enter your command: ");
+            System.out.print("Enter your command: ");
 
             command = read.next().charAt(0);
             read.nextLine();
@@ -40,9 +40,9 @@ public class Main {
             switch(command) {
                 case '1' -> listAllVehicles(vehicles);
                 case '2' -> findVehiclesByMakeModel(vehicles, read);
-                case '3' -> findVehiclesByPriceRange();
-                case '4' -> findVehiclesByColor();
-                case '5' -> addVehicle();
+                case '3' -> findVehiclesByPriceRange(vehicles, read);
+                case '4' -> findVehiclesByColor(vehicles, read);
+                case '5' -> addVehicle(vehicles, vehicleCount, read);
                 default -> command = '6';
             }
         } while (command != '6');
@@ -53,7 +53,7 @@ public class Main {
     static void listAllVehicles(Vehicle[] vehicles) {
         for (Vehicle vehicle : vehicles) {
             if (vehicle == null) {
-                continue;
+                break;
             }
             System.out.printf("%d | %s | %s | %d | $%.2f%n", vehicle.getVehicleId(), vehicle.getMakeModel(),
                     vehicle.getColor(), vehicle.getOdometerReading(), vehicle.getPrice());
@@ -89,7 +89,100 @@ public class Main {
         }
     }
 
-    static void findVehiclesByPriceRange(){}
-    static void findVehiclesByColor(){}
-    static void addVehicle(){}
+    static void findVehiclesByPriceRange(Vehicle[] vehicles, Scanner read) {
+        System.out.print("Enter minimum price: ");
+        double minPrice = read.nextDouble();
+
+        System.out.print("Enter maximum price: ");
+        double maxPrice = read.nextDouble();
+
+        read.nextLine(); // Consume leftover newline
+
+        boolean found = false;
+
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle == null) {
+                continue;
+            }
+
+            double price = vehicle.getPrice();
+
+            if (price >= minPrice && price <= maxPrice) {
+                System.out.printf("%d | %s | %s | %d | $%.2f%n",
+                        vehicle.getVehicleId(),
+                        vehicle.getMakeModel(),
+                        vehicle.getColor(),
+                        vehicle.getOdometerReading(),
+                        vehicle.getPrice());
+
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.printf("No vehicles found between $%.2f and $%.2f.%n",
+                    minPrice, maxPrice);
+        }
+    }
+
+    static void findVehiclesByColor(Vehicle[] vehicles, Scanner read) {
+        System.out.print("Enter color: ");
+        String searchColor = read.nextLine().trim();
+
+        boolean found = false;
+
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle == null) {
+                continue;
+            }
+
+            if (vehicle.getColor().equalsIgnoreCase(searchColor)) {
+                System.out.printf("%d | %s | %s | %d | $%.2f%n",
+                        vehicle.getVehicleId(),
+                        vehicle.getMakeModel(),
+                        vehicle.getColor(),
+                        vehicle.getOdometerReading(),
+                        vehicle.getPrice());
+
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.println("No vehicles found with color: " + searchColor);
+        }
+    }
+
+    static void addVehicle(Vehicle[] vehicles, int vehicleCount, Scanner read) {
+        // Check whether the array is full
+        if (vehicleCount >= vehicles.length) {
+            System.out.println("Inventory is full! Cannot add more vehicles.");
+            return;
+        }
+
+        System.out.print("Enter vehicle ID: ");
+        long vehicleId = read.nextLong();
+        read.nextLine(); // consume CRLF
+
+        System.out.print("Enter make/model: ");
+        String makeModel = read.nextLine().trim();
+
+        System.out.print("Enter color: ");
+        String color = read.nextLine().trim();
+
+        System.out.print("Enter odometer reading: ");
+        int odometerReading = read.nextInt();
+
+        System.out.print("Enter price: ");
+        double price = read.nextDouble();
+        read.nextLine(); // consume CRLF
+
+        // Create and store the new vehicle
+        vehicles[vehicleCount] = new Vehicle(vehicleId, makeModel, color,
+                odometerReading, price);
+
+        vehicleCount++; // updates and keeps track of vehicle count
+
+        System.out.println("Vehicle added successfully!");
+    }
 }
